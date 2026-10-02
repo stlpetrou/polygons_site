@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36' });
+const p = await ctx.newPage();
+p.on('response', (r) => r.status() >= 400 && console.log('HTTP', r.status(), r.url().slice(0, 160)));
+p.on('requestfailed', (r) => console.log('FAILED', r.url().slice(0, 120), r.failure()?.errorText));
+p.on('console', (m) => m.type() === 'error' && console.log('console:', m.text().slice(0, 160)));
+await p.goto('http://polygons.test/', { waitUntil: 'networkidle' });
+await p.click('.pg-chat'); await p.waitForTimeout(9000);
+console.log('button hidden:', await p.$eval('.pg-chat', (e) => e.classList.contains('is-hidden')), '| iframes:', await p.$$eval('iframe', (f) => f.map((x) => x.title || x.src || 'untitled').join(' | ')));
+console.log('Tawk_API loaded:', await p.evaluate(() => !!(window.Tawk_API && window.Tawk_API.maximize)));
+await p.screenshot({ path: 'shots/p3-chat.png' });
+await b.close();

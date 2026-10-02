@@ -1,0 +1,13 @@
+import lighthouse from 'lighthouse';
+import * as chromeLauncher from 'chrome-launcher';
+import { chromium } from 'playwright';
+const chrome = await chromeLauncher.launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new', '--no-sandbox'] });
+const { lhr } = await lighthouse('http://polygons.test' + (process.argv[2] || '/'), { port: chrome.port, output: 'json', logLevel: 'error', onlyCategories: ['performance'] });
+const find = (o, k) => { if (!o || typeof o !== 'object') return; if (o[k]) return o[k]; for (const v of Object.values(o)) { const r = find(v, k); if (r) return r; } };
+const el = lhr.audits['largest-contentful-paint-element'];
+console.log('LCP node:', (find(el?.details, 'snippet') || '').slice(0, 200), '| selector:', find(el?.details, 'selector'));
+const lt = lhr.audits['long-tasks']?.details?.items || [];
+console.log('long tasks:', lt.slice(0, 6).map((t) => (t.url || '').replace('http://polygons.test', '').split('?')[0] + ' ' + Math.round(t.duration) + 'ms@' + Math.round(t.startTime)).join(' | '));
+const bu = lhr.audits['bootup-time']?.details?.items || [];
+console.log('bootup:', bu.slice(0, 5).map((t) => (t.url || '').replace('http://polygons.test', '').split('?')[0] + ' ' + Math.round(t.total) + 'ms').join(' | '));
+await chrome.kill();

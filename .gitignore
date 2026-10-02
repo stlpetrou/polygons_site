@@ -1,0 +1,24 @@
+# Repo = OUR code only (playbook core/site-build-rules.md §10). Never core, third-party plugins, uploads, DB, wp-config.
+/*
+!/.gitignore
+!/README.md
+!/build/
+!/tools/
+!/_projectKnowledge/
+!/app/
+/app/*
+!/app/public/
+/app/public/*
+!/app/public/wp-content/
+/app/public/wp-content/*
+!/app/public/wp-content/themes/
+/app/public/wp-content/themes/*
+!/app/public/wp-content/themes/polygons/
+!/app/public/wp-content/mu-plugins/
+/app/public/wp-content/mu-plugins/*
+!/app/public/wp-content/mu-plugins/polygons-performance.php
+
+tools/node_modules/
+tools/shots/
+*.log
+.DS_Store

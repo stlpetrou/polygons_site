@@ -1,0 +1,23 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const errs = [];
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+p.on('pageerror', (e) => errs.push(e.message));
+await p.goto('http://polygons.test/', { waitUntil: 'networkidle' });
+console.log('pending before scroll:', await p.$eval('.fx-stagger', (e) => e.className.includes('fx-pending')));
+await p.$eval('#ypiresies', (e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY));
+for (const t of [150, 450, 1400]) { await p.waitForTimeout(t === 150 ? 150 : t - 150); await p.screenshot({ path: `shots/stag-${t}.png`, clip: { x: 0, y: 250, width: 1440, height: 600 } }); }
+console.log('final opacities:', await p.$$eval('.fx-stagger > *', (cs) => cs.map((c) => getComputedStyle(c).opacity).join(',')));
+const card = await p.$('.fx-stagger > .pg-card'); const bb = await card.boundingBox();
+await p.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await p.waitForTimeout(500);
+console.log('hover transform:', await card.evaluate((c) => getComputedStyle(c).transform));
+const r = await b.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+await r.goto('http://polygons.test/', { waitUntil: 'networkidle' });
+await r.$eval('#ypiresies', (e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY)); await r.waitForTimeout(200);
+console.log('reduced-motion opacities:', await r.$$eval('.fx-stagger > *', (cs) => cs.map((c) => getComputedStyle(c).opacity).join(',')));
+const m = await b.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+await m.goto('http://polygons.test/', { waitUntil: 'networkidle' });
+await m.$eval('#ypiresies', (e) => window.scrollTo(0, e.getBoundingClientRect().top + scrollY)); await m.waitForTimeout(1500);
+console.log('mobile final opacities:', await m.$$eval('.fx-stagger > *', (cs) => cs.map((c) => getComputedStyle(c).opacity).join(',')));
+console.log('JS errors:', errs.length ? errs : 'none');
+await b.close();

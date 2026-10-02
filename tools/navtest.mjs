@@ -1,0 +1,24 @@
+// Main-nav dropdown check: hover, keyboard (Tab) and mobile drawer. node navtest.mjs → shots/nav-*.png
+import { chromium } from 'playwright';
+const BASE = process.env.BASE || 'http://polygons.test';
+const out = new URL('./shots/', import.meta.url).pathname;
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+await p.goto(BASE + '/blog/', { waitUntil: 'networkidle' });
+const sub = '.pg-header .jet-nav__sub';
+await p.hover('.pg-header .menu-item-has-children > a');
+await p.waitForTimeout(400);
+console.log('hover: submenu visible =', await p.isVisible(sub + ' a'));
+await p.screenshot({ path: out + 'nav-hover.png', clip: { x: 500, y: 0, width: 940, height: 360 } });
+await p.mouse.move(10, 800); await p.waitForTimeout(400);
+await p.focus('.pg-header .menu-item-has-children > a'); await p.keyboard.press('Tab'); await p.waitForTimeout(300);
+console.log('keyboard: focused =', await p.evaluate(() => document.activeElement.textContent.trim()), '| visible =', await p.isVisible(sub + ' a'));
+const m = await b.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+await m.goto(BASE + '/', { waitUntil: 'networkidle' });
+await m.click('.pg-header .jet-nav__mobile-trigger'); await m.waitForTimeout(600);
+await m.screenshot({ path: out + 'nav-mobile.png' });
+console.log('mobile: sub links visible (closed) =', await m.locator('.pg-header .jet-nav__sub a').first().isVisible());
+await m.tap('.pg-header .menu-item-has-children .jet-nav-arrow'); await m.waitForTimeout(500);
+console.log('mobile: after tapping arrow =', await m.locator('.pg-header .jet-nav__sub a').first().isVisible(), '| url', m.url());
+await m.screenshot({ path: out + 'nav-mobile-open.png' });
+await b.close();

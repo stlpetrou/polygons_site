@@ -1,0 +1,14 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch(); const errs = [];
+const m = await b.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+m.on('pageerror', (e) => errs.push(e.message));
+await m.goto('http://polygons.test/', { waitUntil: 'networkidle' }); await m.waitForTimeout(1500);
+console.log('mobile before interaction:', await m.$$eval('.fx-mesh__canvas', (e) => e.length));
+await m.mouse.wheel(0, 40); await m.waitForTimeout(1200);
+console.log('mobile after scroll:', await m.$$eval('.fx-mesh__canvas', (e) => e.length));
+const dsk = await b.newPage({ viewport: { width: 1440, height: 900 } });
+dsk.on('pageerror', (e) => errs.push(e.message));
+await dsk.goto('http://polygons.test/', { waitUntil: 'networkidle' }); await dsk.waitForTimeout(1500);
+console.log('desktop without interaction:', await dsk.$$eval('.fx-mesh__canvas.is-on', (e) => e.length));
+console.log('JS errors:', errs.length ? errs : 'none');
+await b.close();

@@ -1,0 +1,42 @@
+/* Effects Lab only: labels, ON/OFF toggle, and effects not (yet) used on the site: #6 #7 #9 #15 #16 #17. */
+
+.fx-label .elementor-heading-title { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px; border-radius: 999px; border: 1px dashed rgba(241, 81, 82, .5); color: #ff8a8b; font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+.fx-label--live .elementor-heading-title { border-style: solid; border-color: rgba(59, 239, 0, .5); color: #b8f5a3; }
+.fx-toggle { position: fixed; left: 16px; bottom: 16px; z-index: 200; display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .16); background: rgba(12, 12, 18, .85); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; font: 600 14px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+.fx-toggle i { width: 10px; height: 10px; border-radius: 50%; background: #3bef00; box-shadow: 0 0 10px #3bef00; }
+.fx-off .fx-toggle i { background: #80849a; box-shadow: none; }
+
+/* #6 Word-by-word headings */
+.fx-w { display: inline-block; }
+.fx-words.fx-pending .fx-w { opacity: 0; filter: blur(10px); transform: translateY(.45em); }
+.fx-words.fx-pending.is-in .fx-w { opacity: 1; filter: none; transform: none; transition: opacity .7s cubic-bezier(.2, .7, .2, 1), filter .7s, transform .7s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--i) * 55ms); }
+
+/* #7 Process progress line */
+.fx-progress { position: relative; }
+.fx-progress::before { content: ""; position: absolute; left: 0; right: 0; top: -18px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--pg-red), #ff8a8b); box-shadow: 0 0 14px var(--pg-red); transform-origin: 0 50%; transform: scaleX(0); }
+.fx-progress.is-in::before { transform: scaleX(1); transition: transform 1.6s cubic-bezier(.6, 0, .2, 1); }
+.fx-progress > .pg-step { transition: border-color .4s, box-shadow .4s; }
+.fx-progress.is-in > .pg-step { border-color: rgba(241, 81, 82, .5) !important; box-shadow: 0 20px 50px -30px rgba(241, 81, 82, .7); }
+.fx-progress.is-in > .pg-step:nth-child(2) { transition-delay: .4s; }
+.fx-progress.is-in > .pg-step:nth-child(3) { transition-delay: .8s; }
+.fx-progress.is-in > .pg-step:nth-child(4) { transition-delay: 1.2s; }
+
+/* #9 Reading progress */
+.fx-read { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 150; transform-origin: 0 50%; transform: scaleX(var(--p, 0)); background: linear-gradient(90deg, var(--pg-red), #ff8a8b); box-shadow: 0 0 12px var(--pg-red); pointer-events: none; }
+@supports (animation-timeline: scroll()) {
+	.fx-read { animation: fx-read linear both; animation-timeline: scroll(root); }
+	@keyframes fx-read { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
+
+/* #15 Counters (Elementor Counter widget) */
+.fx-counter .elementor-counter-number-wrapper { font-family: var(--pg-display); font-weight: 700; font-size: clamp(44px, 5vw, 64px); line-height: 1; color: #fff; text-shadow: 0 0 24px rgba(241, 81, 82, .45); justify-content: flex-start; }
+.fx-counter .elementor-counter-number-suffix { color: var(--pg-red); }
+.fx-counter .elementor-counter-title { justify-content: flex-start; color: var(--pg-muted); font-size: 15px; margin-top: 8px; }
+
+/* #13 demo card */
+.fx-vt-card { max-width: 420px; }
+.fx-vt-media img { view-transition-name: fx-demo-media; border-radius: 20px; display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.fx-vt-detail .fx-vt-card { max-width: none; }
+.fx-vt-detail .fx-vt-media img { aspect-ratio: 21 / 9; border-radius: 28px; }
+.fx-vt-back, .fx-vt-detail .fx-vt-open { display: none; }
+.fx-vt-detail .fx-vt-back { display: block; }
