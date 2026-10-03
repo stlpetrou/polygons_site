@@ -2,8 +2,10 @@
 # Plesk Git "additional deployment action": copies OUR code from the deployed repo into the site's wp-content.
 # Usage (in Plesk): sh deploy/plesk-deploy.sh <path to the site's document root, relative to the repo dir or absolute>
 # Atomic per folder: copy to a temp dir, then swap — no request ever sees a half-copied theme.
+# Plesk runs actions in a chrooted shell (cp/mv/rm/mkdir only — no dirname, date, git): shell builtins only.
 set -eu
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
+case "$0" in */*) cd "${0%/*}/.." ;; *) cd .. ;; esac
+REPO="$(pwd)"
 cd "$REPO"
 DOC="${1:?document root, e.g. ../../staging.polygons.gr}"
 WPC="$(cd "$DOC" && pwd)/wp-content"
@@ -19,4 +21,4 @@ rm -rf "$WPC/themes/.polygons.old"
 mkdir -p "$WPC/mu-plugins"
 cp "$SRC/mu-plugins/polygons-performance.php" "$WPC/mu-plugins/.polygons-performance.php.new"
 mv "$WPC/mu-plugins/.polygons-performance.php.new" "$WPC/mu-plugins/polygons-performance.php"
-echo "Deployed $(git -C "$REPO" rev-parse --short HEAD 2>/dev/null || echo '?') → $WPC ($(date '+%F %T'))"
+echo "Deployed OK → $WPC"
